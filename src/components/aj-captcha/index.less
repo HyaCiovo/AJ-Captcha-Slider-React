@@ -1,0 +1,296 @@
+@oss_url: '//nft-static-oss.xxxxxx.com/activity/';
+
+.verifybox {
+  position: absolute;
+  padding-top: 24px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1px solid #e4e7eb;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  // height: 580px;
+  top: 22vh;
+  user-select: none;
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+
+  .adm-skeleton.adm-skeleton-title {
+    margin-top: 16px;
+    margin-bottom: 0;
+  }
+}
+
+.verifybox-top {
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: self-start;
+  height: 48px;
+  line-height: 40px;
+  text-align: left;
+  font-size: 28px;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.verifybox-bottom {
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.verifybox-close {
+  font-size: 32px;
+  color: #999 !important;
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.verify-tips {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  padding: 0 12px;
+  color: #fff;
+}
+
+/* ---------------------------- */
+/*常规验证码*/
+.verify-code {
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 5px;
+  border: 1px solid #ddd;
+}
+
+.cerify-code-panel {
+  height: 100%;
+  overflow: hidden;
+}
+
+.verify-code-area {
+  float: left;
+}
+
+.verify-input-area {
+  float: left;
+  width: 60%;
+  padding-right: 10px;
+}
+
+.verify-change-area {
+  line-height: 30px;
+  float: left;
+}
+
+.varify-input-code {
+  display: inline-block;
+  width: 100%;
+  height: 25px;
+}
+
+.verify-change-code {
+  color: #337ab7;
+  cursor: pointer;
+}
+
+.verify-btn {
+  width: 200px;
+  height: 30px;
+  background-color: #337ab7;
+  color: #ffffff;
+  border: none;
+  margin-top: 10px;
+}
+
+/*滑动验证码*/
+.verify-bar-area {
+  position: relative;
+  background: #f5f5f5;
+  text-align: center;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.verify-bar-area .verify-move-block {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  background: #fff;
+  cursor: pointer;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  box-shadow: 0 6px 16px -8px #00000014, 0 9px 28px 0 #0000000d,
+    0 12px 48px 16px #00000008;
+  border-radius: 4px;
+}
+
+.verify-bar-area .verify-left-bar {
+  position: absolute;
+  top: 0;
+  left: 1px;
+  background: #f0f0ff;
+  cursor: pointer;
+}
+
+.verify-img-panel {
+  margin: 0;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  border-bottom: 1px solid #ddd;
+  border-radius: 3px;
+  position: relative;
+}
+
+.verify-img-panel .verify-gap {
+  background-color: #fff;
+  position: relative;
+  z-index: 2;
+  border: 1px solid #fff;
+}
+
+.verify-bar-area .verify-move-block .verify-sub-block {
+  position: absolute;
+  text-align: center;
+  z-index: 3;
+  /* border: 1px solid #fff; */
+}
+
+.verify-bar-area .verify-move-block .verify-icon {
+  font-size: 18px;
+}
+
+.verify-bar-area .verify-msg {
+  margin-left: 70px;
+  font-size: 24px;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  list-style: 40px;
+  color: #999;
+  z-index: 3;
+}
+
+/*字体图标的css*/
+
+.iconfont {
+  font-family: 'iconfont' !important;
+  font-size: 30px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-check:before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 9999;
+  background-image: url("@{oss_url}digital-trade-expo/icon-check.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.icon-fail:before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 9999;
+  background-image: url("@{oss_url}digital-trade-expo/icon-fail.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.icon-right:before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-size: cover;
+  z-index: 9999;
+  background-image: url("@{oss_url}digital-trade-expo/icon-right.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.verify-img-out {
+  margin-top: 16px;
+  height: 512px;
+}
+
+.btn {
+  border: none;
+  outline: none;
+  width: 300px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #409eff;
+  color: #fff;
+  font-size: 16px;
+  letter-spacing: 1em;
+}
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.5s;
+}
+
+.verify-very-bottom {
+  border-top: 1px solid #e5e5e5;
+  margin-top: 24px;
+  padding: 16px 24px;
+
+  .verify-refresh {
+    font-size: 28px;
+    font-family: PingFangSC-Regular;
+    font-weight: 400;
+    line-height: 44px;
+    cursor: pointer;
+    color: #666;
+
+    .verify-refresh-icon {
+      margin-right: 5px;
+    }
+  }
+}
