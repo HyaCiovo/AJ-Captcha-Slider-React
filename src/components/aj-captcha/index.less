@@ -29,8 +29,7 @@
   height: 48px;
   line-height: 40px;
   text-align: left;
-  font-size: 28px;
-  font-family: PingFangSC-Medium;
+  font-size: 24px;
   font-weight: 500;
   color: #333;
   box-sizing: border-box;
@@ -42,25 +41,17 @@
 }
 
 .verifybox-close {
-  font-size: 32px;
+  font-size: 28px;
   color: #999 !important;
   position: absolute;
-  top: 22px;
+  top: 30px;
   right: 24px;
   text-align: center;
   cursor: pointer;
-}
 
-.verify-tips {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 100%;
-  height: 30px;
-  line-height: 30px;
-  font-size: 12px;
-  padding: 0 12px;
-  color: #fff;
+  &:hover {
+    color: #333 !important;
+  }
 }
 
 /* ---------------------------- */
@@ -76,41 +67,6 @@
 .cerify-code-panel {
   height: 100%;
   overflow: hidden;
-}
-
-.verify-code-area {
-  float: left;
-}
-
-.verify-input-area {
-  float: left;
-  width: 60%;
-  padding-right: 10px;
-}
-
-.verify-change-area {
-  line-height: 30px;
-  float: left;
-}
-
-.varify-input-code {
-  display: inline-block;
-  width: 100%;
-  height: 25px;
-}
-
-.verify-change-code {
-  color: #337ab7;
-  cursor: pointer;
-}
-
-.verify-btn {
-  width: 200px;
-  height: 30px;
-  background-color: #337ab7;
-  color: #ffffff;
-  border: none;
-  margin-top: 10px;
 }
 
 /*滑动验证码*/
@@ -156,18 +112,10 @@
   position: relative;
 }
 
-.verify-img-panel .verify-gap {
-  background-color: #fff;
-  position: relative;
-  z-index: 2;
-  border: 1px solid #fff;
-}
-
 .verify-bar-area .verify-move-block .verify-sub-block {
   position: absolute;
   text-align: center;
   z-index: 3;
-  /* border: 1px solid #fff; */
 }
 
 .verify-bar-area .verify-move-block .verify-icon {
@@ -175,23 +123,12 @@
 }
 
 .verify-bar-area .verify-msg {
-  margin-left: 70px;
-  font-size: 24px;
-  font-family: PingFangSC-Medium;
+  margin-left: 90px;
+  font-size: 20px;
   font-weight: 500;
   list-style: 40px;
   color: #999;
   z-index: 3;
-}
-
-/*字体图标的css*/
-
-.iconfont {
-  font-family: 'iconfont' !important;
-  font-size: 30px;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-check:before {
@@ -282,12 +219,15 @@
   padding: 16px 24px;
 
   .verify-refresh {
-    font-size: 28px;
-    font-family: PingFangSC-Regular;
     font-weight: 400;
+    font-size: 20px;
     line-height: 44px;
     cursor: pointer;
     color: #666;
+
+    &:hover {
+      color: #333 !important;
+    }
 
     .verify-refresh-icon {
       margin-right: 5px;

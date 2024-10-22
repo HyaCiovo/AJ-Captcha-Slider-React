@@ -5,9 +5,17 @@ import react from "@vitejs/plugin-react-swc";
 export default defineConfig({
   plugins: [react()],
   server: {
+    proxy: {
+      "/api": {
+        target: "https://xxxxxxxxxxxxx.com", // 线上地址
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, "/api/h5"),
+      },
+    },
     host: true,
     open: true,
-    port: 3333,
+    port: 4000,
   },
   css: {
     preprocessorOptions: {

@@ -1,9 +1,18 @@
 import { useState } from 'react'
-import './App.css'
+import './App.less'
 import AJCaptcha from './components/aj-captcha'
-import { Button } from 'antd'
+import { ConfigProvider, App as AntdApp } from 'antd'
 
-function App() {
+const AntdTheme = {
+  hashed: false,
+  token: {
+    // colorPrimary: "#0754b2",
+    colorTextBase: "#333",
+    fontFamily: "Comic Sans MS",
+    // colorPrimaryHover: "#0754b2",
+  },
+};
+const App = () => {
   const [showCaptcha, setShow] = useState<boolean>(false)
 
   const onSuccess = (token: string) => {
@@ -12,23 +21,24 @@ function App() {
   }
 
   return (
-    <>
-      <AJCaptcha
-        show={showCaptcha}
-        onSuccess={onSuccess}
-        hide={() => setShow(false)}
-      />
-      <h1>AJ-Captcha-React</h1>
-      <h2>函数组件Demo</h2>
-      <div className="card">
-        <Button type="primary" size="large" onClick={() => setShow(true)}>
-          打开验证码弹框
-        </Button>
-      </div>
-      <p className="read-the-docs">
-        组件代码详见  `components/aj-captcha`
-      </p>
-    </>
+    <ConfigProvider theme={AntdTheme}>
+      <AntdApp>
+        <AJCaptcha
+          show={showCaptcha}
+          onSuccess={onSuccess}
+          hide={() => setShow(false)}
+        />
+        <h1>AJ-Captcha-React</h1>
+        <div className="card">
+          <button onClick={() => setShow(true)}>
+            open captcha modal
+          </button>
+        </div>
+        <p className="read-the-docs">
+          See component code in `components/aj-captcha`
+        </p>
+      </AntdApp>
+    </ConfigProvider>
   )
 }
 

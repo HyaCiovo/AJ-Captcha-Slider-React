@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Skeleton } from 'antd';
-import { UndoOutlined, CloseOutlined } from '@ant-design/icons'
+import { App, Skeleton } from 'antd';
+import { UndoOutlined, CloseOutlined, LoadingOutlined } from '@ant-design/icons'
 import { throttle } from 'lodash-es';
 import { getPicture, checkCaptcha, CaptchaRes } from './service'
 import { aesEncrypt } from './aes';
@@ -11,6 +11,7 @@ interface AJCaptchaProps {
   show: boolean
   vSpace?: number
   blockWidth?: number
+  padding?: number
   hide: () => void
   onSuccess: (secret: string) => void
   setSize?: {
@@ -23,28 +24,33 @@ interface AJCaptchaProps {
 
 const AJCaptcha: React.FC<AJCaptchaProps> = ({
   show = false,
-  vSpace = 12,
-  blockWidth = 48,
+  vSpace = 20,  // 图片与滑块的距离，单位px
+  blockWidth = 88, // 滑块宽度44 此处*2，单位px
+  padding = 32, // 弹框内边距 单位px
   hide,
   onSuccess,
   setSize = {
-    imgWidth: 360,
-    imgHeight: 155,
-    barHeight: 36,
-    barWidth: 360
+    imgWidth: 620, // 图片宽度为310px，此处*2
+    imgHeight: 310, // 图片高度
+    barHeight: 50, // 滑块框高度
+    barWidth: 620 // 滑块框宽度，与图片宽度保持一致
   }
 }) => {
   const nodeRef = useRef<HTMLElement | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(true); // 是否加载
+  const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
   const [icon, setIcon] = useState<string>(''); // 滑块icon
-  const [mouseStatus, setMouseStatus] = useState<boolean>(false); // 鼠标状态
-  const [isEnd, setEnd] = useState<boolean>(false); // 是否验证结束
-  const [tips, setTips] = useState<string>('按住左边按钮拖动完成上方拼图'); // 提示文案
+  const [tips, setTips] = useState<string>('Drag the left button to complete the puzzle above'); // 提示文案
   const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
   const [barAreaLeft, setBarAreaLeft] = useState<number>(0);
   const [barAreaOffsetWidth, setBarAreaOffsetWidth] = useState<number>(0);
+  const flags = useRef<{ isEnd: boolean, status: boolean }>({
+    isEnd: false,
+    status: false
+  })
+  const { message } = App.useApp();
+
 
   if (!nodeRef.current) {
     const node = document.createElement('div');
@@ -53,7 +59,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
   }
 
   useEffect(() => {
-    init();
     uuid();
 
     // 清理函数
@@ -63,7 +68,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
         nodeRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   useEffect(() => {
@@ -72,29 +77,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show])
 
-  /**
-   * 初始化鼠标事件监听
-   * 该函数主要用于初始化鼠标事件监听器，包括鼠标移动和松开事件
-   * 首先移除已存在的事件监听器，然后再重新添加，以确保事件处理函数的唯一性和最新性
-   */
-  const init = () => {
-    // 移除已有的鼠标移动事件监听器，防止重复监听
-    window.removeEventListener('mousemove', function (e) {
-      move(e)
-    })
-    // 移除已有的鼠标松开事件监听器，同样防止重复监听
-    window.removeEventListener('mouseup', function () {
-      end()
-    })
-    // 添加鼠标移动事件监听器
-    window.addEventListener('mousemove', function (e) {
-      move(e)
-    })
-    // 添加鼠标松开事件监听器
-    window.addEventListener('mouseup', function () {
-      end()
-    })
-  }
 
   // 初始化 uuid
   const uuid = () => {
@@ -139,14 +121,14 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
     // 重新获取数据
     getData();
 
-    // 重置鼠标状态为false，通常用于表示鼠标不再处于特定的交互状态
-    setMouseStatus(false);
-
-    // 重置结束状态为false，表示某个交互或过程尚未完成
-    setEnd(false);
+    // 重置flags状态，准备下一次交互
+    flags.current = {
+      isEnd: false,
+      status: false
+    }
 
     // 设置提示信息，指导用户进行下一步操作
-    setTips('按住左边按钮拖动完成上方拼图');
+    setTips('Drag the left button to complete the puzzle above');
 
     // 重置方块左侧位置，以便重新计算或应用默认布局
     setBlockLeft('');
@@ -173,10 +155,12 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
    * @param event HTMLDivElement类型，代表触发事件的HTML元素它用于获取栏区域的位置和宽度信息
    */
   const setBarArea = (event: HTMLDivElement | null) => {
+    if (!event)
+      return;
     // 获取栏区域左边界的坐标
-    const newBarAreaLeft = event?.getBoundingClientRect().left || 0;
+    const newBarAreaLeft = event.getBoundingClientRect().left;
     // 获取栏区域的宽度
-    const newBarAreaOffsetWidth = event?.offsetWidth || 0;
+    const newBarAreaOffsetWidth = event.offsetWidth;
     // 更新状态，设置栏区域的左边界
     setBarAreaLeft(newBarAreaLeft);
     // 更新状态，设置栏区域的宽度
@@ -184,35 +168,37 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
   }
 
   const start = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (isEnd)
+    if (flags.current.isEnd)
       return;
-    setMouseStatus(true)
+    flags.current.status = true
     setTips('')
     e.stopPropagation()
   }
 
-  const move = (e: MouseEvent) => {
-    if (!mouseStatus || isEnd) return;
+  const move = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!flags.current.status || flags.current.isEnd) return;
 
     const x = e.clientX
+
     const maxLeft = barAreaOffsetWidth - blockWidth
 
     const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
     // 拖动后小方块的left值
     const left = `${Math.max(0, moveBlockLeft)}px`;
+
     setBlockLeft(left);
     setLeftBarWidth(left);
   }
 
   const end = () => {
     // 判断是否重合
-    if (mouseStatus && !isEnd) {
+    if (flags.current.status && !flags.current.isEnd) {
       const moveLeftDistance = parseInt(
         (moveBlockLeft || '').replace('px', '')
       )
 
       const rawPointJson = JSON.stringify({
-        x: moveLeftDistance,
+        x: moveLeftDistance / 2,
         y: 5.0
       })
 
@@ -221,7 +207,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
         pointJson: response?.secretKey
           ? aesEncrypt(rawPointJson, response?.secretKey)
           : rawPointJson,
-        token: response!.token,
+        token: response?.token || '',
         clientUid: localStorage.getItem('slider')!,
         ts: Date.now()
       }
@@ -230,23 +216,34 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
 
       checkCaptcha(data)
         .then((res) => {
-          setEnd(true)
-          setIcon('success')
-          setTimeout(() => {
-            const params = `${res.token}---${rawPointJson}`
-            // console.log(params)
-            onSuccess(aesEncrypt(params, response?.secretKey))
-            closeBox()
-          }, 1000)
+          console.log(res)
+          flags.current.isEnd = true
+          if (res.token) {
+            setIcon('check')
+            message.success('Verification successful!')
+            setTimeout(() => {
+              const params = `${res.token}---${rawPointJson}`
+              onSuccess(aesEncrypt(params, response?.secretKey))
+              closeBox()
+            }, 1000)
+          }
+          else {
+            setIcon('fail')
+            message.error('Verification failed!')
+            setTimeout(() => {
+              refresh()
+            }, 800)
+          }
         })
         .catch(() => {
-          setEnd(true)
+          flags.current.isEnd = true
           setIcon('fail')
+          message.error('Verification failed!')
           setTimeout(() => {
             refresh()
           }, 800)
         })
-      setMouseStatus(false)
+      flags.current.status = false
     }
   }
 
@@ -257,34 +254,36 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
 
 
   return createPortal(// 蒙层
-    <div className="mask" style={{
-      display: show ? 'block' : 'none',
-    }}>
+    <div className={`mask ${!show && 'hidden'}`} onMouseMove={move} onMouseUp={end}>
       <div className="verifybox"
-        style={{ maxWidth: setSize.imgWidth + 48 + "px" }}
+        style={{ maxWidth: setSize.imgWidth + 2 * padding + "px" }}
       >
         <div className="verifybox-top">
-          请完成下列验证后继续：
+          Please complete the following verification:
           <CloseOutlined
             className="verifybox-close"
             onClick={closeBox}
           />
         </div>
-        {isLoading && (
-          <div className="verifybox-bottom">
-            <div style={{ position: 'relative', width: setSize.imgWidth }}>
-              <Skeleton.Image active
-                style={{ height: setSize.imgHeight, width: setSize.imgWidth }} />
+        <div className="verifybox-bottom">
+          {isLoading ?
+            <div className="relative"
+              style={{
+                width: setSize.imgWidth,
+              }}>
+              <div
+                className="verify-img-out"
+                style={{ height: setSize.imgHeight + vSpace }}
+              >
+                <Skeleton.Image active
+                  style={{ height: setSize.imgHeight, width: setSize.imgWidth }} />
+              </div>
               <Skeleton.Node active
-                style={{ height: setSize.barHeight, width: setSize.barWidth, marginTop: vSpace }}
+                style={{ height: setSize.barHeight, width: setSize.barWidth }}
               />
             </div>
-          </div>
-        )}
-        {!isLoading && (
-          <div className="verifybox-bottom">
-            {/* 验证容器 */}
-            <div style={{ position: 'relative' }}>
+            :
+            <div className="relative">
               <div
                 className="verify-img-out"
                 style={{ height: setSize.imgHeight + vSpace }}
@@ -296,27 +295,22 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
                     height: setSize.imgHeight
                   }}
                 >
-                  {response?.backImgBase && (
+                  {response?.originalImageBase64 &&
                     <img
-                      src={'data:image/png;base64,' + response?.backImgBase}
-                      alt=""
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        display: 'block'
-                      }}
-                    />
-                  )}
+                      src={'data:image/png;base64,' + response?.originalImageBase64}
+                      alt="captcha-image"
+                      className="w-full h-full block rounded"
+                    />}
                 </div>
               </div>
 
               <div
-                className="verify-bar-area"
+                className="verify-bar-area rounded"
                 style={{
                   width: setSize.barWidth,
                   height: setSize.barHeight
                 }}
-                ref={(bararea) => setBarArea(bararea)}
+                ref={(e) => setBarArea(e)}
               >
                 <div
                   className="verify-msg"
@@ -339,50 +333,46 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
                     className="verify-move-block"
                     onMouseDown={start}
                     style={{
-                      width: `${blockWidth}px`,
-                      height: '34px',
-                      // backgroundColor: this.state.moveBlockBackgroundColor,
-                      left: moveBlockLeft || 0
+                      width: blockWidth,
+                      height: 48,
+                      left: moveBlockLeft || '0px'
                     }}
                   >
-                    <i className={`verify-icon iconfont icon-${icon}`} />
+                    <i className={`verify-icon icon-${icon}`} />
                     <div
-                      className="verify-sub-block"
+                      className='verify-sub-block'
                       style={{
-                        width: `${blockWidth}px`,
+                        width: blockWidth,
                         height: setSize.imgHeight,
                         top: `-${setSize.imgHeight + vSpace}px`,
                         backgroundSize: `${setSize.imgWidth} ${setSize.imgHeight}`
                       }}
                     >
-                      {response?.blockBackImgBase && (
+                      {response?.jigsawImageBase64 &&
                         <img
                           src={
                             'data:image/png;base64,' +
-                            response?.blockBackImgBase
+                            response?.jigsawImageBase64
                           }
-                          alt=""
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'block'
-                          }}
-                        />
-                      )}
+                          alt="blockImage"
+                          className="w-full h-full block"
+                        />}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          }
+
+        </div>
         <div className="verify-very-bottom">
           <div
             className="verify-refresh"
             onClick={throttle(refresh, 100)}
           >
-            <UndoOutlined className="verify-refresh-icon" />
-            <span>刷新</span>
+            {isLoading ? <LoadingOutlined className="mr-2" />
+              : <UndoOutlined className="mr-2 -rotate-90" />}
+            <span>refresh</span>
           </div>
         </div>
       </div>

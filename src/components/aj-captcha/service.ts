@@ -1,8 +1,8 @@
 export type CaptchaRes = {
   token: string;
   secretKey: string;
-  backImgBase: string;
-  blockBackImgBase: string;
+  originalImageBase64: string;
+  jigsawImageBase64: string;
 };
 /**
  * 异步获取验证码图片
@@ -14,7 +14,7 @@ export type CaptchaRes = {
  */
 export const getPicture = async (): Promise<CaptchaRes> => {
   // 发送GET请求到指定API端点获取验证码图片数据
-  return await fetch("/api/captcha/getPicture")
+  return await fetch("/api/captcha/get")
     .then((res) => res.json())
     .then((res) => {
       // 解析响应数据并返回具体的验证码图片数据
@@ -34,7 +34,7 @@ export const checkCaptcha = async (data: {
   ts: number;
 }): Promise<{ token: string }> => {
   // 发送POST请求到指定API端点进行验证码校验
-  return await fetch("/api/captcha/checkCaptcha", {
+  return await fetch("/api/captcha/check", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
