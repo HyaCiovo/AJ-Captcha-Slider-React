@@ -7,6 +7,29 @@ import { getPicture, checkCaptcha, CaptchaRes } from './service'
 import { aesEncrypt } from './aes';
 import './index.less'
 
+/**
+ * 生成一个全局唯一标识符（UUID）
+ * 
+ * UUID的格式为xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx，其中：
+ * - x表示一个随机的十六进制数字
+ * - y表示一个随机的十六进制数字，但其二进制表示的高两位必须是01（确保UUID的版本为4）
+ * 
+ * 此函数使用Math.random生成随机数，并将其转换为十六进制格式以替换UUID模板中的x和y
+ * 通过这种方式，可以生成一个随机的、符合UUID标准的唯一标识符
+ * 
+ * @returns {string} 一个随机生成的UUID字符串
+ */
+const uuid = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    // 生成一个0到15之间的随机整数
+    const r = (Math.random() * 16) | 0;
+    // 如果当前字符是x，则直接使用随机数；如果是y，则确保随机数的高两位是01
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    // 将生成的随机数转换为十六进制字符串
+    return v.toString(16);
+  });
+};
+
 interface AJCaptchaProps {
   show: boolean
   vSpace?: number
@@ -39,7 +62,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
   const nodeRef = useRef<HTMLElement | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
-  const [icon, setIcon] = useState<string>(''); // 滑块icon
+  const [icon, setIcon] = useState<'right' | 'fail' | 'loading' | 'check'>('right'); // 滑块icon
   const [tips, setTips] = useState<string>('Drag the left button to complete the puzzle above'); // 提示文案
   const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
@@ -51,7 +74,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
   })
   const { message } = App.useApp();
 
-
   if (!nodeRef.current) {
     const node = document.createElement('div');
     document.body.appendChild(node);
@@ -59,7 +81,8 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
   }
 
   useEffect(() => {
-    uuid();
+    if (!localStorage.getItem("slider"))
+      localStorage.setItem("slider", `slider-${uuid()}`);
 
     // 清理函数
     return () => {
@@ -68,7 +91,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
         nodeRef.current = null;
       }
     };
-
   }, []);
 
   useEffect(() => {
@@ -76,38 +98,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
       refresh()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show])
-
-
-  // 初始化 uuid
-  const uuid = () => {
-    // 初始化一个空数组用于存储uuid的各个部分
-    const s = [];
-    // 定义十六进制数字字符集
-    const hexDigits = "0123456789abcdef";
-    // 生成uuid的主要部分，共36个字符（包括连字符）
-    for (let i = 0; i < 36; i++) {
-      // 随机生成十六进制字符并添加到数组中
-      s[i] = hexDigits[Math.floor(Math.random() * 0x10)];
-    }
-    // 设置uuid的版本号为4（时间基于版本）
-    s[14] = "4";
-    // 设置uuid的变体为2（按照RFC 4122标准）
-    s[19] = hexDigits[(parseInt(s[19], 16) & 0x3) | 0x8];
-    // 插入连字符，形成标准的uuid格式
-    s[8] = s[13] = s[18] = s[23] = "-";
-
-    // 构造特定格式的slider和point字符串
-    const slider = "slider" + "-" + s.join("");
-    const point = "point" + "-" + s.join("");
-    // 检查本地存储中是否存在slider，如果不存在则存储
-    if (!localStorage.getItem("slider")) {
-      localStorage.setItem("slider", slider);
-    }
-    // 检查本地存储中是否存在point，如果不存在则存储
-    if (!localStorage.getItem("point")) {
-      localStorage.setItem("point", point);
-    }
-  }
 
   /**
    * 刷新数据和界面状态的函数
@@ -212,8 +202,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
         ts: Date.now()
       }
 
-      setIcon('loading')
-
       checkCaptcha(data)
         .then((res) => {
           console.log(res)
@@ -254,7 +242,10 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
 
 
   return createPortal(// 蒙层
-    <div className={`mask ${!show && 'hidden'}`} onMouseMove={move} onMouseUp={end}>
+    <div className="mask"
+      style={{ display: `${show ? 'block' : 'none'}` }}
+      onMouseMove={move}
+      onMouseUp={end}>
       <div className="verifybox"
         style={{ maxWidth: setSize.imgWidth + 2 * padding + "px" }}
       >
@@ -299,13 +290,14 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
                     <img
                       src={'data:image/png;base64,' + response?.originalImageBase64}
                       alt="captcha-image"
-                      className="w-full h-full block rounded"
+                      draggable={false}
+                      className="verify-img"
                     />}
                 </div>
               </div>
 
               <div
-                className="verify-bar-area rounded"
+                className="verify-bar-area"
                 style={{
                   width: setSize.barWidth,
                   height: setSize.barHeight
@@ -337,8 +329,9 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
                       height: 48,
                       left: moveBlockLeft || '0px'
                     }}
-                  >
-                    <i className={`verify-icon icon-${icon}`} />
+                  >{icon === 'loading' ?
+                    <LoadingOutlined size={28} /> :
+                    <i className={`verify-icon icon-${icon}`} />}
                     <div
                       className='verify-sub-block'
                       style={{
@@ -355,7 +348,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
                             response?.jigsawImageBase64
                           }
                           alt="blockImage"
-                          className="w-full h-full block"
+                          className="verify-img"
                         />}
                     </div>
                   </div>
@@ -370,9 +363,9 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
             className="verify-refresh"
             onClick={throttle(refresh, 100)}
           >
-            {isLoading ? <LoadingOutlined className="mr-2" />
-              : <UndoOutlined className="mr-2 -rotate-90" />}
-            <span>refresh</span>
+            {isLoading ? <LoadingOutlined />
+              : <UndoOutlined rotate={-90} />}
+            <span className='verify-refresh-text'>refresh</span>
           </div>
         </div>
       </div>
