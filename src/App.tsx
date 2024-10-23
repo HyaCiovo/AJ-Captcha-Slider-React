@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import './App.less'
-import AJCaptcha from './components/aj-captcha'
+import AJCaptcha from './components/aj-captcha-react'
 import { ConfigProvider, App as AntdApp } from 'antd'
 
 const AntdTheme = {
   hashed: false,
   token: {
-    // colorPrimary: "#0754b2",
     colorTextBase: "#333",
     fontFamily: "Comic Sans MS",
-    // colorPrimaryHover: "#0754b2",
   },
 };
 const App = () => {
@@ -35,7 +33,7 @@ const App = () => {
           </button>
         </div>
         <p className="read-the-docs">
-          See component code in `components/aj-captcha`
+          See component code in `components/aj-captcha-react`
         </p>
       </AntdApp>
     </ConfigProvider>

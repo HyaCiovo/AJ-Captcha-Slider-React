@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { App, Skeleton } from 'antd';
-import { UndoOutlined, CloseOutlined, LoadingOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, CloseCircleOutlined, CloseOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons'
 import { throttle } from 'lodash-es';
 import { getPicture, checkCaptcha, CaptchaRes } from './service'
 import { aesEncrypt } from './aes';
@@ -45,10 +45,29 @@ interface AJCaptchaProps {
   }
 }
 
+type AJCaptchaIconProps = 'right' | 'fail' | 'loading' | 'check'
+const AJCaptchaIcon = (props: { icon: AJCaptchaIconProps }) => {
+
+  const iconStyle: React.CSSProperties = {
+    fontSize: '22px',
+    color: '#999'
+  }
+  switch (props.icon) {
+    case 'right':
+      return <DoubleRightOutlined style={iconStyle} />
+    case 'fail':
+      return <CloseCircleOutlined style={{ ...iconStyle, color: '#ff4d4f' }} />
+    case 'loading':
+      return <LoadingOutlined style={iconStyle} />
+    case 'check':
+      return <CheckCircleOutlined style={{ ...iconStyle, color: '#52c41a' }} />
+  }
+}
+
 const AJCaptcha: React.FC<AJCaptchaProps> = ({
   show = false,
   vSpace = 20,  // 图片与滑块的距离，单位px
-  blockWidth = 88, // 滑块宽度44 此处*2，单位px
+  blockWidth = 90, // 滑块宽度45 此处*2，单位px
   padding = 32, // 弹框内边距 单位px
   hide,
   onSuccess,
@@ -62,7 +81,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
   const nodeRef = useRef<HTMLElement | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
-  const [icon, setIcon] = useState<'right' | 'fail' | 'loading' | 'check'>('right'); // 滑块icon
+  const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
   const [tips, setTips] = useState<string>('Drag the left button to complete the puzzle above'); // 提示文案
   const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
@@ -161,7 +180,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
     if (flags.current.isEnd)
       return;
     flags.current.status = true
-    setTips('')
     e.stopPropagation()
   }
 
@@ -175,7 +193,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
     const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
     // 拖动后小方块的left值
     const left = `${Math.max(0, moveBlockLeft)}px`;
-
+    setTips('')
     setBlockLeft(left);
     setLeftBarWidth(left);
   }
@@ -329,9 +347,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
                       height: 48,
                       left: moveBlockLeft || '0px'
                     }}
-                  >{icon === 'loading' ?
-                    <LoadingOutlined size={28} /> :
-                    <i className={`verify-icon icon-${icon}`} />}
+                  >{<AJCaptchaIcon icon={icon} />}
                     <div
                       className='verify-sub-block'
                       style={{
@@ -363,8 +379,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
             className="verify-refresh"
             onClick={throttle(refresh, 100)}
           >
-            {isLoading ? <LoadingOutlined />
-              : <UndoOutlined rotate={-90} />}
+            <ReloadOutlined spin={isLoading} />
             <span className='verify-refresh-text'>refresh</span>
           </div>
         </div>

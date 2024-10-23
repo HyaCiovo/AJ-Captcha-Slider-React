@@ -1,5 +1,3 @@
-@oss_url: '//nft-static-oss.xxxxx.com/activity/';
-
 .verifybox {
   position: absolute;
   padding-top: 24px;
@@ -111,34 +109,6 @@
   list-style: 40px;
   color: #999;
   z-index: 3;
-}
-
-// 定义公共样式混合器
-.icon-common(@width: 24px, @height: 24px, @icon-url: '') {
-  content: '';
-  display: block;
-  width: @width;
-  height: @height;
-  position: absolute;
-  margin: auto;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 9999;
-  background: url('@{oss_url}digital-trade-expo/@{icon-url}') no-repeat center / cover;
-}
-
-.icon-check:before {
-  .icon-common(28px, 28px, 'icon-check.svg');
-}
-
-.icon-fail:before {
-  .icon-common(24px, 24px, 'icon-fail.svg');
-}
-
-.icon-right:before {
-  .icon-common(36px, 36px, 'icon-right.svg');
 }
 
 .verify-img {
