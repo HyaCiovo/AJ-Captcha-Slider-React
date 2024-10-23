@@ -58,7 +58,7 @@ export const checkCaptcha = async (data: {
   ts: number;
 }): Promise<CheckCaptchaRes> => {
   // 生成随机延迟时间，模拟网络延迟
-  const delay = Math.random() * 1000;
+  const delay = Math.random() * 1500;
   // 定义误差范围，用于验证点击位置，不要过小或者过大，推荐范围在1到3之间
   const buffer = 2;
 
@@ -72,6 +72,8 @@ export const checkCaptcha = async (data: {
         // 解密用户点击的位置信息
         const decryptRes = aesDecrypt(data.pointJson, mockCaptchaRes.secretKey);
         const point = JSON.parse(decryptRes);
+
+        console.log({ captchaX: x, buffer, sliderX: point.x });
 
         // 验证点击位置是否在有效范围内
         if (!point.x || point.x > x + buffer || point.x < x - buffer) {

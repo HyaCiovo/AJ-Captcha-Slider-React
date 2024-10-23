@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { App, Skeleton } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, CloseOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
+// import { createPortal } from 'react-dom';
+import { App, Modal, Skeleton } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
 // import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/captcha';
 import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/mock';
 import { aesEncrypt, uuid } from './utils';
@@ -46,21 +46,20 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   show = false,
   vSpace = 20,  // 图片与滑块的距离，单位px
   blockWidth = 90, // 滑块宽度45 此处*2，单位px
-  padding = 32, // 弹框内边距 单位px
+  padding = 28, // 弹框内边距 单位px
   hide,
   onSuccess,
   setSize = {
-    imgWidth: 620, // 图片宽度为310px，此处*2
-    imgHeight: 310, // 图片高度
+    imgWidth: 310 * 2, // 图片宽度为310px，此处*2
+    imgHeight: 155 * 2, // 图片高度
     barHeight: 50, // 滑块框高度
-    barWidth: 620 // 滑块框宽度，与图片宽度保持一致
+    barWidth: 310 * 2 // 滑块框宽度，与图片宽度保持一致
   }
 }) => {
-  const nodeRef = useRef<HTMLElement | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
   const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
-  const [tips, setTips] = useState<string>('Drag the left button to complete the puzzle above'); // 提示文案
+  const [tips, setTips] = useState<string>('Please drag the left button'); // 提示文案
   const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
   const [barAreaLeft, setBarAreaLeft] = useState<number>(0);
@@ -71,22 +70,14 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   })
   const { message } = App.useApp();
 
-  if (!nodeRef.current) {
-    const node = document.createElement('div');
-    document.body.appendChild(node);
-    nodeRef.current = node;
-  }
-
   useEffect(() => {
     if (!localStorage.getItem("slider"))
       localStorage.setItem("slider", `slider-${uuid()}`);
 
     // 清理函数
     return () => {
-      if (nodeRef.current) {
-        document.body.removeChild(nodeRef.current);
-        nodeRef.current = null;
-      }
+      if (localStorage.getItem("slider")) 
+        localStorage.removeItem("slider");
     };
   }, []);
 
@@ -115,7 +106,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     }
 
     // 设置提示信息，指导用户进行下一步操作
-    setTips('Drag the left button to complete the puzzle above');
+    setTips('Please drag the left button');
 
     // 重置方块左侧位置，以便重新计算或应用默认布局
     setBlockLeft('');
@@ -179,6 +170,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const end = () => {
     // 判断是否重合
     if (flags.current.status && !flags.current.isEnd) {
+      setIcon('loading')
       const moveLeftDistance = parseInt(
         (moveBlockLeft || '').replace('px', '')
       )
@@ -200,7 +192,6 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
 
       checkCaptcha(data)
         .then((res) => {
-          console.log(rawPointJson)
           flags.current.isEnd = true
           if (res.token) {
             setIcon('check')
@@ -236,25 +227,27 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     hide?.()
   }
 
-
-  return createPortal(// 蒙层
-    <div className="mask"
-      style={{ display: `${show ? 'block' : 'none'}` }}
-      onMouseMove={move}
-      onMouseUp={end}>
+  return (
+    <Modal
+      title="Please complete the following verification:"
+      centered
+      open={show}
+      width={setSize.imgWidth + 2 * padding}
+      styles={{
+        content: {
+          padding: `16px ${padding}px 16px`,
+          userSelect: 'none'
+        }
+      }}
+      footer={null}
+      onCancel={closeBox}
+    >
       <div className="verifybox"
-        style={{ maxWidth: setSize.imgWidth + 2 * padding + "px" }}
-      >
-        <div className="verifybox-top">
-          Please complete the following verification:
-          <CloseOutlined
-            className="verifybox-close"
-            onClick={closeBox}
-          />
-        </div>
-        <div className="verifybox-bottom">
+        onMouseMove={move}
+        onMouseUp={end}>
+        <div>
           {isLoading ?
-            <div className="relative"
+            <div
               style={{
                 width: setSize.imgWidth,
               }}>
@@ -362,7 +355,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
           </div>
         </div>
       </div>
-    </div>, nodeRef.current!)
+    </Modal>)
 };
 
 export default AJCaptchaSlider;
