@@ -1,33 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { App, Skeleton } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, CloseOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons'
-import { getPicture, checkCaptcha, CaptchaRes } from './service'
-import { aesEncrypt } from './aes';
-import './index.less'
+import { CheckCircleOutlined, CloseCircleOutlined, CloseOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
+// import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/captcha';
+import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/mock';
+import { aesEncrypt, uuid } from './utils';
+import './index.less';
 
-/**
- * 生成一个全局唯一标识符（UUID）
- * 
- * UUID的格式为xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx，其中：
- * - x表示一个随机的十六进制数字
- * - y表示一个随机的十六进制数字，但其二进制表示的高两位必须是01（确保UUID的版本为4）
- * 
- * 此函数使用Math.random生成随机数，并将其转换为十六进制格式以替换UUID模板中的x和y
- * 通过这种方式，可以生成一个随机的、符合UUID标准的唯一标识符
- * 
- * @returns {string} 一个随机生成的UUID字符串
- */
-const uuid = (): string => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    // 生成一个0到15之间的随机整数
-    const r = (Math.random() * 16) | 0;
-    // 如果当前字符是x，则直接使用随机数；如果是y，则确保随机数的高两位是01
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    // 将生成的随机数转换为十六进制字符串
-    return v.toString(16);
-  });
-};
 
 interface AJCaptchaSliderProps {
   show: boolean
@@ -221,6 +200,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
 
       checkCaptcha(data)
         .then((res) => {
+          console.log(rawPointJson)
           flags.current.isEnd = true
           if (res.token) {
             setIcon('check')

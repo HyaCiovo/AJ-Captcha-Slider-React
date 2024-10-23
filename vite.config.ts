@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://xxxxxxxxxxxxx.com", // 线上地址
+        target: "https://hyacinth.aj-captcha-slider.com", // 更换为 自己的服务器地址
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, "/api/h5"),
