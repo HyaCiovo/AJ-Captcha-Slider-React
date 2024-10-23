@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { App, Skeleton } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, CloseOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons'
-import { throttle } from 'lodash-es';
 import { getPicture, checkCaptcha, CaptchaRes } from './service'
 import { aesEncrypt } from './aes';
 import './index.less'
@@ -30,7 +29,7 @@ const uuid = (): string => {
   });
 };
 
-interface AJCaptchaProps {
+interface AJCaptchaSliderProps {
   show: boolean
   vSpace?: number
   blockWidth?: number
@@ -64,7 +63,7 @@ const AJCaptchaIcon = (props: { icon: AJCaptchaIconProps }) => {
   }
 }
 
-const AJCaptcha: React.FC<AJCaptchaProps> = ({
+const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   show = false,
   vSpace = 20,  // 图片与滑块的距离，单位px
   blockWidth = 90, // 滑块宽度45 此处*2，单位px
@@ -222,7 +221,6 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
 
       checkCaptcha(data)
         .then((res) => {
-          console.log(res)
           flags.current.isEnd = true
           if (res.token) {
             setIcon('check')
@@ -377,7 +375,7 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
         <div className="verify-very-bottom">
           <div
             className="verify-refresh"
-            onClick={throttle(refresh, 100)}
+            onClick={refresh}
           >
             <ReloadOutlined spin={isLoading} />
             <span className='verify-refresh-text'>refresh</span>
@@ -387,4 +385,4 @@ const AJCaptcha: React.FC<AJCaptchaProps> = ({
     </div>, nodeRef.current!)
 };
 
-export default AJCaptcha;
+export default AJCaptchaSlider;

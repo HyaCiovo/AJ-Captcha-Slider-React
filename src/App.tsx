@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.less'
-import AJCaptcha from './components/aj-captcha-react'
+import AJCaptchaSlider from './components/aj-captcha-slider-react'
 import { ConfigProvider, App as AntdApp } from 'antd'
 
 const AntdTheme = {
@@ -21,12 +21,12 @@ const App = () => {
   return (
     <ConfigProvider theme={AntdTheme}>
       <AntdApp>
-        <AJCaptcha
+        <AJCaptchaSlider
           show={showCaptcha}
           onSuccess={onSuccess}
           hide={() => setShow(false)}
         />
-        <h1>AJ-Captcha-React</h1>
+        <h1>AJ-Captcha-Slider-React</h1>
         <div className="card">
           <button onClick={() => setShow(true)}>
             open captcha modal
