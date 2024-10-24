@@ -74,7 +74,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
 
     // 清理函数
     return () => {
-      if (localStorage.getItem("slider")) 
+      if (localStorage.getItem("slider"))
         localStorage.removeItem("slider");
     };
   }, []);
@@ -143,27 +143,39 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     setBarAreaOffsetWidth(newBarAreaOffsetWidth);
   }
 
-  const start = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const start = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (flags.current.isEnd)
       return;
     flags.current.status = true
     e.stopPropagation()
   }
 
-  const move = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!flags.current.status || flags.current.isEnd) return;
+/**
+ * 处理滑动事件的方法，用于更新滑动块的位置和相关的状态
+ * @param e React的鼠标点击事件或触摸事件对象
+ */
+const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  // 如果当前状态不允许滑动或滑动已结束，则直接返回，不执行后续操作
+  if (!flags.current.status || flags.current.isEnd) return;
 
-    const x = e.clientX
+  // 根据事件类型（触摸或鼠标）获取滑动的x坐标
+  const x = 'touches' in e ? e.touches[0].pageX : e.clientX
 
-    const maxLeft = barAreaOffsetWidth - blockWidth
+  // 计算滑动块可以移动的最大左边距
+  const maxLeft = barAreaOffsetWidth - blockWidth
 
-    const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
-    // 拖动后小方块的left值
-    const left = `${Math.max(0, moveBlockLeft)}px`;
-    setTips('')
-    setBlockLeft(left);
-    setLeftBarWidth(left);
-  }
+  // 根据滑动位置计算滑动块的实际左边距，确保它在允许的范围内
+  const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
+  // 拖动后小方块的left值
+  const left = `${Math.max(0, moveBlockLeft)}px`;
+  
+  // 设置提示信息为空，表示滑动操作正常进行，无错误或额外信息需要展示
+  setTips('');
+  // 更新滑动块的左边距
+  setBlockLeft(left);
+  // 同时更新左侧栏的宽度，保持与滑动块位置一致
+  setLeftBarWidth(left);
+}
 
   const end = () => {
     // 判断是否重合
@@ -242,7 +254,9 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     >
       <div className="verifybox"
         onMouseMove={move}
-        onMouseUp={end}>
+        onTouchMove={move}
+        onMouseUp={end}
+        onTouchEnd={end}>
         <div>
           {isLoading ?
             <div
@@ -311,6 +325,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                   <div
                     className="verify-move-block"
                     onMouseDown={start}
+                    onTouchStart={start}
                     style={{
                       width: blockWidth,
                       height: 48,
