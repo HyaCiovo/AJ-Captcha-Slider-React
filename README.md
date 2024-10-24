@@ -131,9 +131,9 @@ export default App;
 | hide             | () => void                                                  | -                                                | 关闭验证码弹窗的回调函数                     |
 | onSuccess        | (secret: string) => void                                    | -                                                | 验证成功后的回调函数，参数为加密后的 `token` |
 | setSize          | { imgWidth: number; imgHeight: number; barHeight: number; } | { imgWidth: 310, imgHeight: 155, barHeight: 36 } | 设置图片和滑块的高度和宽度                   |
-| title            | string                                                      | "Title"                                          | 弹窗标题                                     |
-| tips             | string                                                      | "Tips"                                           | 滑块提示文案                                 |
-| refreshText      | string                                                      | "Refresh"                                        | 刷新按钮的文本                               |
+| title            | string                                                      | -                                                | 弹窗标题                                     |
+| tips             | string                                                      | -                                                | 滑块提示文案                                 |
+| refreshText      | string                                                      | -                                                | 刷新按钮的文本                               |
 
 
 
