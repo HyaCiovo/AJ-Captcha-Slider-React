@@ -115,15 +115,39 @@ export default App;
 
 
 
-## 属性说明
 
-- **`show`**: `boolean` - 控制验证码模态框的显示与隐藏，默认值为 `false`。
-- **`vSpace`**: `number` - 图片与滑块的距离，单位为像素，默认值为 `20`。
-- **`blockWidth`**: `number` - 滑块宽度，单位为像素，默认值为 `90`。
-- **`padding`**: `number` - 弹框横向内边距，单位为像素，默认值为 `28`。
-- **`hide`**: `() => void` - 关闭验证码模态框的回调函数。
-- **`onSuccess`**: `(secret: string) => void` - 验证成功的回调函数，参数为加密后的验证结果。
-- **`setSize`**: `{ imgWidth: number, imgHeight: number, barHeight: number }` - 自定义图片和滑块的尺寸，默认值为 `{ imgWidth: 620, imgHeight: 310, barHeight: 50 }`。
+
+## API
+
+### Props
+
+| 属性名           | 类型                                                        | 默认值                                           | 描述                                         |
+| :--------------- | :---------------------------------------------------------- | :----------------------------------------------- | :------------------------------------------- |
+| show             | boolean                                                     | false                                            | 控制验证码弹窗的显示与隐藏                   |
+| size             | 'default' \| 'big' \| 'large'                               | 'default'                                        | 验证码组件的尺寸                             |
+| vSpace           | number                                                      | 18                                               | 图片与滑块的距离，单位`px`                   |
+| sliderBlockWidth | number                                                      | 45                                               | 滑块宽度，单位`px`                           |
+| padding          | number                                                      | 16                                               | 弹框内边距，单位`px`                         |
+| hide             | () => void                                                  | -                                                | 关闭验证码弹窗的回调函数                     |
+| onSuccess        | (secret: string) => void                                    | -                                                | 验证成功后的回调函数，参数为加密后的 `token` |
+| setSize          | { imgWidth: number; imgHeight: number; barHeight: number; } | { imgWidth: 310, imgHeight: 155, barHeight: 36 } | 设置图片和滑块的高度和宽度                   |
+| title            | string                                                      | "Title"                                          | 弹窗标题                                     |
+| tips             | string                                                      | "Tips"                                           | 滑块提示文案                                 |
+| refreshText      | string                                                      | "Refresh"                                        | 刷新按钮的文本                               |
+
+
+
+### Functions
+
+#### refresh()
+
+刷新验证码数据和界面状态。
+
+#### closeBox()
+
+关闭验证码弹窗。
+
+
 
 
 

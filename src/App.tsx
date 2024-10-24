@@ -31,12 +31,12 @@ const App = () => {
       setSize("default")
     else if (w < 980)
       setSize("big")
-    else {
+    else 
       setSize("large")
-    }
   };
 
   useEffect(() => {
+    resizeUpdate()
     // 页面变化时获取浏览器窗口的大小 
     window.addEventListener('resize', resizeUpdate);
 
