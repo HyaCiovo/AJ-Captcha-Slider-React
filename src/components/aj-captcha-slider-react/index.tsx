@@ -19,7 +19,6 @@ interface AJCaptchaSliderProps {
     imgWidth: number
     imgHeight: number
     barHeight: number
-    barWidth: number
   }
 }
 
@@ -53,7 +52,6 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     imgWidth: 310 * 2, // 图片宽度为310px，此处*2
     imgHeight: 155 * 2, // 图片高度
     barHeight: 50, // 滑块框高度
-    barWidth: 310 * 2 // 滑块框宽度，与图片宽度保持一致
   }
 }) => {
   const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
@@ -259,7 +257,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                   style={{ height: setSize.imgHeight, width: setSize.imgWidth }} />
               </div>
               <Skeleton.Node active
-                style={{ height: setSize.barHeight, width: setSize.barWidth }}
+                style={{ height: setSize.barHeight, width: setSize.imgWidth }}
               />
             </div>
             :
@@ -288,7 +286,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
               <div
                 className="verify-bar-area"
                 style={{
-                  width: setSize.barWidth,
+                  width: setSize.imgWidth,
                   height: setSize.barHeight
                 }}
                 ref={(e) => setBarArea(e)}

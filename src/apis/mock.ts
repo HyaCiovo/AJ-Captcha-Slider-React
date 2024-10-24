@@ -1,10 +1,18 @@
 import { aesDecrypt } from "../components/aj-captcha-slider-react/utils";
 import mockCaptchaData from "./mockDB";
 
+/**
+ * 定义验证码响应类型
+ * 该类型用于表示验证码服务返回的数据结构
+ */
 export type CaptchaRes = {
+  /** 用于验证的令牌 */
   token: string;
+  /** 用于验证用户身份的密钥 */
   secretKey: string;
+  /** 原始图片的Base64编码 */
   originalImageBase64: string;
+  /** 滑动验证码图片的Base64编码 */
   jigsawImageBase64: string;
 };
 
