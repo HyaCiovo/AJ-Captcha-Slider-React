@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.less'
 import AJCaptchaSlider from './components/aj-captcha-slider-react'
 import { ConfigProvider, App as AntdApp, ThemeConfig } from 'antd'
+import { GithubOutlined } from '@ant-design/icons';
 
 const AntdTheme: ThemeConfig = {
   hashed: false,
@@ -31,7 +32,7 @@ const App = () => {
       setSize("default")
     else if (w < 980)
       setSize("big")
-    else 
+    else
       setSize("large")
   };
 
@@ -54,21 +55,33 @@ const App = () => {
     <ConfigProvider theme={AntdTheme}>
       <AntdApp>
         <AJCaptchaSlider
+          title="Verify Modal"
+          tips="Slide the slider to the right"
+          refreshText="Refresh"
           show={showCaptcha}
           onSuccess={onSuccess}
           size={size}
           hide={() => setShow(false)}
         />
-        <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center p-4 pt-56">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-10 text-gray-800">
+        <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center p-4 pt-40">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
             AJ-Captcha-Slider-React
           </h1>
-          <button className="text-base my-6" onClick={() => setShow(true)}>
+          <div className="text-sm sm:text-lg md:text-xl pb-10">
+            AJ-Captcha-Slider-React is a simple and easy-to-use captcha component for React 🥳.
+          </div>
+          <button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-6 my-10 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" onClick={() => setShow(true)}>
             Show Verify Modal
           </button>
-          <div className="text-base py-6">
-            See component code in `components/aj-captcha-slider-react`
+          <div className="text-sm text-gray-500 text-center mt-16">
+            <span className="mr-2">Made with ❤️ by</span>
+            <a href="https://github.com/HyaCiovo" target="_blank" className="hover:underline">
+              <GithubOutlined
+                style={{ fontSize: "1.4em" }} />
+              <span className="text-blue-500 ml-2">HyaCiovo</span>
+            </a>
           </div>
+
         </div>
       </AntdApp>
     </ConfigProvider>
