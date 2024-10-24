@@ -1,5 +1,7 @@
 # AJ-Captcha-Slider-React
 
+
+
 ## 介绍
 
 `AJCaptcha-Slider` 是一个基于 [anji-plus/captcha](https://github.com/anji-plus/captcha) 实现的`React`滑块验证码组件，用于验证用户身份。该组件通过显示一张带有缺失部分的图片，并要求用户将缺失部分拖动到正确位置来完成验证。
@@ -160,6 +162,14 @@ export default App;
 - **React**: 用于构建组件。
 - **antd**: 提供模态框、消息和骨架屏等 UI 组件。
 - **@ant-design/icons**: 提供图标组件。
+
+
+
+## 工具代码
+
+- **aesEncrypt**: 用于加密验证码数据。
+- **aesDecrypt**: 用于在服务端解密验证码数据。
+- **uuid**: 用于生成随机的 UUID。
 
 
 
