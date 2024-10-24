@@ -1,5 +1,4 @@
-// .verifybox {
-// }
+
 
 /*滑动验证码*/
 .verify-bar-area {
@@ -30,6 +29,10 @@
   border-radius: 4px;
 }
 
+.verify-img-out {
+  margin-top: 12px;
+}
+
 .verify-bar-area .verify-left-bar {
   position: absolute;
   top: 0;
@@ -54,17 +57,16 @@
   z-index: 3;
 }
 
-.verify-bar-area .verify-move-block .verify-icon {
-  font-size: 18px;
-}
-
 .verify-bar-area .verify-msg {
-  margin-left: 65px;
-  font-size: 20px;
   font-weight: 500;
   list-style: 40px;
   color: #999;
   z-index: 3;
+  padding: 0 16px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .verify-img {
@@ -72,11 +74,6 @@
   height: 100%;
   border-radius: 4px;
   display: block;
-}
-
-.verify-img-out {
-  margin-top: 20px;
-  height: 512px;
 }
 
 .mask {
@@ -92,23 +89,22 @@
 
 .verify-very-bottom {
   border-top: 1px solid #e5e5e5;
-  margin-top: 24px;
-  padding: 16px 0 0;
+  margin-top: 16px;
+}
 
-  .verify-refresh {
-    width: fit-content;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 44px;
-    cursor: pointer;
-    color: #666;
+.verify-refresh {
+  width: fit-content;
+  font-weight: 400;
+  cursor: pointer;
+  overflow: hidden;
+  color: #666;
+  padding-top: 10px;
+}
 
-    &:hover {
-      color: #0754b2 !important;
-    }
+.verify-refresh:hover {
+  color: #0754b2 !important;
+}
 
-    .verify-refresh-text {
-      margin-left: 8px;
-    }
-  }
+.verify-refresh-text {
+  margin-left: 8px;
 }

@@ -1,17 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
-// import { createPortal } from 'react-dom';
 import { App, Modal, Skeleton } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
 // import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/captcha';
 import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/mock';
 import { aesEncrypt, uuid } from './utils';
-import './index.less';
+import './index.css';
 
+const Scale = {
+  'default': 1,
+  'big': 1.4,
+  'large': 1.8
+}
 
 interface AJCaptchaSliderProps {
+  scale?: number
+  size?: 'default' | 'big' | 'large'
   show: boolean
   vSpace?: number
-  blockWidth?: number
+  sliderBlockWidth?: number
   padding?: number
   hide: () => void
   onSuccess: (secret: string) => void
@@ -20,13 +26,16 @@ interface AJCaptchaSliderProps {
     imgHeight: number
     barHeight: number
   }
+  title?: string
+  tips?: string
+  refreshText?: string
 }
 
 type AJCaptchaIconProps = 'right' | 'fail' | 'loading' | 'check'
 const AJCaptchaIcon = (props: { icon: AJCaptchaIconProps }) => {
 
   const iconStyle: React.CSSProperties = {
-    fontSize: '22px',
+    fontSize: '18px',
     color: '#999'
   }
   switch (props.icon) {
@@ -43,21 +52,25 @@ const AJCaptchaIcon = (props: { icon: AJCaptchaIconProps }) => {
 
 const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   show = false,
-  vSpace = 20,  // 图片与滑块的距离，单位px
-  blockWidth = 90, // 滑块宽度45 此处*2，单位px
-  padding = 28, // 弹框内边距 单位px
+  title = "Title",
+  tips = "Tips",
+  refreshText = 'Refresh',
+  size = "default",
+  vSpace = 18,  // 图片与滑块的距离，单位px
+  sliderBlockWidth = 45, // 滑块宽度45，单位px
+  padding = 16, // 弹框内边距 单位px
   hide,
   onSuccess,
   setSize = {
-    imgWidth: 310 * 2, // 图片宽度为310px，此处*2
-    imgHeight: 155 * 2, // 图片高度
-    barHeight: 50, // 滑块框高度
+    imgWidth: 310, // 图片宽度
+    imgHeight: 155, // 图片高度
+    barHeight: 36, // 滑块框高度
   }
 }) => {
   const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
   const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
-  const [tips, setTips] = useState<string>('Please drag the left button'); // 提示文案
+  const [showTips, setTips] = useState<boolean>(true); // 提示文案
   const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
   const [barAreaLeft, setBarAreaLeft] = useState<number>(0);
@@ -67,6 +80,11 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     status: false
   })
   const { message } = App.useApp();
+
+  const scale = Scale[size]
+  const blockWidth = sliderBlockWidth * scale
+  const imgWidth = setSize.imgWidth * scale
+  const imgHeight = setSize.imgHeight * scale
 
   useEffect(() => {
     if (!localStorage.getItem("slider"))
@@ -104,7 +122,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     }
 
     // 设置提示信息，指导用户进行下一步操作
-    setTips('Please drag the left button');
+    setTips(true);
 
     // 重置方块左侧位置，以便重新计算或应用默认布局
     setBlockLeft('');
@@ -150,32 +168,32 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     e.stopPropagation()
   }
 
-/**
- * 处理滑动事件的方法，用于更新滑动块的位置和相关的状态
- * @param e React的鼠标点击事件或触摸事件对象
- */
-const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-  // 如果当前状态不允许滑动或滑动已结束，则直接返回，不执行后续操作
-  if (!flags.current.status || flags.current.isEnd) return;
+  /**
+   * 处理滑动事件的方法，用于更新滑动块的位置和相关的状态
+   * @param e React的鼠标点击事件或触摸事件对象
+   */
+  const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    // 如果当前状态不允许滑动或滑动已结束，则直接返回，不执行后续操作
+    if (!flags.current.status || flags.current.isEnd) return;
 
-  // 根据事件类型（触摸或鼠标）获取滑动的x坐标
-  const x = 'touches' in e ? e.touches[0].pageX : e.clientX
+    // 根据事件类型（触摸或鼠标）获取滑动的x坐标
+    const x = 'touches' in e ? e.touches[0].pageX : e.clientX
 
-  // 计算滑动块可以移动的最大左边距
-  const maxLeft = barAreaOffsetWidth - blockWidth
+    // 计算滑动块可以移动的最大左边距
+    const maxLeft = barAreaOffsetWidth - blockWidth
 
-  // 根据滑动位置计算滑动块的实际左边距，确保它在允许的范围内
-  const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
-  // 拖动后小方块的left值
-  const left = `${Math.max(0, moveBlockLeft)}px`;
-  
-  // 设置提示信息为空，表示滑动操作正常进行，无错误或额外信息需要展示
-  setTips('');
-  // 更新滑动块的左边距
-  setBlockLeft(left);
-  // 同时更新左侧栏的宽度，保持与滑动块位置一致
-  setLeftBarWidth(left);
-}
+    // 根据滑动位置计算滑动块的实际左边距，确保它在允许的范围内
+    const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
+    // 拖动后小方块的left值
+    const left = `${Math.max(0, moveBlockLeft)}px`;
+
+    // 设置提示信息为空，表示滑动操作正常进行，无错误或额外信息需要展示
+    setTips(false);
+    // 更新滑动块的左边距
+    setBlockLeft(left);
+    // 同时更新左侧栏的宽度，保持与滑动块位置一致
+    setLeftBarWidth(left);
+  }
 
   const end = () => {
     // 判断是否重合
@@ -186,7 +204,7 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
       )
 
       const rawPointJson = JSON.stringify({
-        x: moveLeftDistance / 2,
+        x: moveLeftDistance / scale,
         y: 5.0
       })
 
@@ -239,13 +257,13 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
 
   return (
     <Modal
-      title="Please complete the following verification:"
+      title={title}
       centered
       open={show}
-      width={setSize.imgWidth + 2 * padding}
+      width={imgWidth + 2 * padding}
       styles={{
         content: {
-          padding: `16px ${padding}px 16px`,
+          padding: `16px ${padding}px 10px`,
           userSelect: 'none'
         }
       }}
@@ -261,30 +279,30 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
           {isLoading ?
             <div
               style={{
-                width: setSize.imgWidth,
+                width: imgWidth,
               }}>
               <div
                 className="verify-img-out"
-                style={{ height: setSize.imgHeight + vSpace }}
+                style={{ height: imgHeight + vSpace }}
               >
                 <Skeleton.Image active
-                  style={{ height: setSize.imgHeight, width: setSize.imgWidth }} />
+                  style={{ height: imgHeight, width: imgWidth }} />
               </div>
               <Skeleton.Node active
-                style={{ height: setSize.barHeight, width: setSize.imgWidth }}
+                style={{ height: setSize.barHeight, width: imgWidth }}
               />
             </div>
             :
-            <div className="relative">
+            <div>
               <div
                 className="verify-img-out"
-                style={{ height: setSize.imgHeight + vSpace }}
+                style={{ height: imgHeight + vSpace }}
               >
                 <div
                   className="verify-img-panel"
                   style={{
-                    width: setSize.imgWidth,
-                    height: setSize.imgHeight
+                    width: imgWidth,
+                    height: imgHeight
                   }}
                 >
                   {response?.originalImageBase64 &&
@@ -300,14 +318,19 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
               <div
                 className="verify-bar-area"
                 style={{
-                  width: setSize.imgWidth,
+                  width: imgWidth,
                   height: setSize.barHeight
                 }}
                 ref={(e) => setBarArea(e)}
               >
                 <div
                   className="verify-msg"
-                  style={{ lineHeight: setSize.barHeight + 'px' }}
+                  style={{
+                    lineHeight: setSize.barHeight + 'px',
+                    marginLeft: blockWidth + 'px',
+                    width: imgWidth - blockWidth + 'px',
+                    display: showTips ? 'block' : 'none'
+                  }}
                 >
                   {tips}
                 </div>
@@ -328,7 +351,7 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
                     onTouchStart={start}
                     style={{
                       width: blockWidth,
-                      height: 48,
+                      height: setSize.barHeight - 2,
                       left: moveBlockLeft || '0px'
                     }}
                   >{<AJCaptchaIcon icon={icon} />}
@@ -336,9 +359,9 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
                       className='verify-sub-block'
                       style={{
                         width: blockWidth,
-                        height: setSize.imgHeight,
-                        top: `-${setSize.imgHeight + vSpace}px`,
-                        backgroundSize: `${setSize.imgWidth} ${setSize.imgHeight}`
+                        height: imgHeight,
+                        top: `-${imgHeight + vSpace}px`,
+                        backgroundSize: `${imgWidth} ${imgHeight}`
                       }}
                     >
                       {response?.jigsawImageBase64 &&
@@ -364,7 +387,7 @@ const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElem
             onClick={refresh}
           >
             <ReloadOutlined spin={isLoading} />
-            <span className='verify-refresh-text'>refresh</span>
+            <span className='verify-refresh-text'>{refreshText}</span>
           </div>
         </div>
       </div>
