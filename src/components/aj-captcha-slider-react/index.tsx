@@ -3,7 +3,7 @@ import { App, Modal, Skeleton } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, DoubleRightOutlined, LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
 // import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/captcha';
 import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/mock';
-import { aesEncrypt, uuid } from './utils';
+import { aesEncrypt, setStyle, uuid } from './utils';
 import './index.less';
 
 const Scale = {
@@ -67,23 +67,10 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     barHeight: 36, // 滑块框高度
   }
 }) => {
-  const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
-  const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
-  const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
-  const [showTips, setTips] = useState<boolean>(true); // 是否展示提示文案
-  const [moveBlockLeft, setBlockLeft] = useState<string | null>(null); // 滑块左边界和左侧色块宽度
-  const [blockPressed, setPressed] = useState<boolean>(false); // 滑块是否被按下
-
-  const barAreaRef = useRef({
-    barAreaLeft: 0,
-    barAreaOffsetWidth: 0
-  })
-
-  const isEnd = useRef<boolean>(false);
-  const status = useRef<boolean>(false);
-  const moveLeft = useRef<string>('');
-
-  const { message } = App.useApp();
+  const scale = Scale[size];
+  const blockWidth = sliderBlockWidth * scale;
+  const imgWidth = setSize.imgWidth * scale;
+  const imgHeight = setSize.imgHeight * scale;
 
   const isSupportTouch = 'ontouchstart' in window;
   const events = isSupportTouch
@@ -98,10 +85,22 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
       end: 'mouseup'
     };
 
-  const scale = Scale[size]
-  const blockWidth = sliderBlockWidth * scale
-  const imgWidth = setSize.imgWidth * scale
-  const imgHeight = setSize.imgHeight * scale
+  const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
+  const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
+  const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
+  const [showTips, setTips] = useState<boolean>(true); // 是否展示提示文案
+  const [blockPressed, setPressed] = useState<boolean>(false); // 滑块是否被按下
+
+  const barAreaRef = useRef({
+    barAreaLeft: 0,
+    barAreaOffsetWidth: 0
+  })
+  const leftBarRef = useRef<HTMLDivElement>(null)
+
+  const isEnd = useRef<boolean>(false);
+  const status = useRef<boolean>(false);
+
+  const { message } = App.useApp();
 
   useEffect(() => {
     if (!localStorage.getItem("slider"))
@@ -111,7 +110,11 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     return () => {
       if (localStorage.getItem("slider"))
         localStorage.removeItem("slider");
+      document.removeEventListener(events.move, move as any);
+      document.removeEventListener(events.end, end);
+      document.removeEventListener('touchcancel', end);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -132,15 +135,12 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     // 重新获取数据
     getData();
 
-    // 重置flags状态，准备下一次交互
+    // 重置状态，准备下一次交互
     isEnd.current = false;
     status.current = false;
 
     // 设置提示信息，指导用户进行下一步操作
     setTips(true);
-
-    // 重置方块左侧位置，以便重新计算或应用默认布局
-    setBlockLeft('');
   }
 
   const getData = () => {
@@ -202,15 +202,18 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
 
     // 根据滑动位置计算滑动块的实际左边距，确保它在允许的范围内
     const moveBlockLeft = Math.max(0, Math.min(x - barAreaRef.current.barAreaLeft - blockWidth / 2, maxLeft))
+
     // 拖动后小方块的left值
-    const left = `${Math.max(0, moveBlockLeft)}px`;
+    const left = Math.max(0, moveBlockLeft);
+
+    // 计算对应leftBar的width值
+    const width = `${left + blockWidth}px`
 
     // 设置提示信息为空，表示滑动操作正常进行，无错误或额外信息需要展示
     setTips(false);
-    // 更新滑动块的左边距
-    setBlockLeft(left);
-    // 记录滑动块的左边距
-    moveLeft.current = left;
+
+    // 设置leftBar的width值
+    setStyle(leftBarRef.current, { width })
   }
   const end = () => {
     document.removeEventListener(events.move, move as any);
@@ -220,12 +223,12 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     if (status.current && !isEnd.current) {
       setIcon('loading')
 
-      const moveLeftDistance = parseInt(
-        moveLeft.current.replace('px', '')
+      const leftBarWidth = parseInt(
+        (leftBarRef.current?.style.width || '').replace('px', '')
       )
 
       const rawPointJson = JSON.stringify({
-        x: moveLeftDistance / scale,
+        x: (leftBarWidth - blockWidth) / scale, // 计算x轴偏移量
         y: 5.0
       })
 
@@ -354,11 +357,9 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
               </div>
               <div
                 className="verify-left-bar"
+                ref={leftBarRef}
                 style={{
-                  width:
-                    moveBlockLeft !== null
-                      ? moveBlockLeft
-                      : setSize.barHeight,
+                  width: blockWidth,
                   height: setSize.barHeight,
                   touchAction: 'pan-y'
                 }}
@@ -372,7 +373,6 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                     backgroundColor: blockPressed ? '#f2f2f2' : '#fff',
                     cursor: blockPressed ? 'grab' : 'pointer',
                     height: setSize.barHeight - 2,
-                    left: moveBlockLeft || '0px'
                   }}
                 >{<AJCaptchaIcon icon={icon} />}
                   <div

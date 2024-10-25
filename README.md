@@ -192,9 +192,10 @@ export default App;
 
 ## 工具代码
 
-- **aesEncrypt**: 用于加密验证码数据。
-- **aesDecrypt**: 用于在服务端解密验证码数据。
-- **uuid**: 用于生成随机的 UUID。
+- **aesEncrypt**: 用于加密验证码数据；
+- **aesDecrypt**: 用于在服务端解密验证码数据；
+- **uuid**: 用于生成随机的 UUID；
+- **setStyle**: 用于设置元素的样式。
 
 
 
