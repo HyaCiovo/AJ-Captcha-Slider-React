@@ -51,15 +51,15 @@
 
 1. 验证失败，刷新验证图片：
 
-   <img src="./public/readme/fail.gif" alt="img"  style="height:350px; width=450px" />
+   <img src="./docs/fail.gif" alt="img"  style="height:350px; width=450px" />
 
 2. 手动刷新验证图片：
 
-   <img src="./public/readme/refresh.gif" alt="img"  style="height:350px; width=600px"  />
+   <img src="./docs/refresh.gif" alt="img"  style="height:350px; width=600px"  />
 
 3. 验证成功，关闭模态框：
 
-   <img src="./public/readme/check.gif" alt="img" style="height:350px; width=400px" />
+   <img src="./docs/check.gif" alt="img" style="height:350px; width=400px" />
 
 
 

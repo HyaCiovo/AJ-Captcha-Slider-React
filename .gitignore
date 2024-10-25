@@ -1,3 +1,4 @@
-# Logs
 node_modules
 pnpm-lock.yaml
+build
+.vscode/*
