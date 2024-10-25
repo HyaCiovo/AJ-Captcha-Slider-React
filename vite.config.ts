@@ -22,6 +22,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
   const isBuild = command === "build";
 
   return {
+    base: "./",
     plugins: createVitePlugins(isBuild),
     server: {
       proxy: {
