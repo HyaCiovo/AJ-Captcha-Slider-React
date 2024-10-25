@@ -63,25 +63,65 @@ const App = () => {
           size={size}
           hide={() => setShow(false)}
         />
-        <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center p-4 pt-40">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
-            AJ-Captcha-Slider-React
-          </h1>
-          <div className="text-sm sm:text-lg md:text-xl pb-10">
-            AJ-Captcha-Slider-React is a simple and easy-to-use captcha component for React 🥳.
-          </div>
-          <button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-3 px-6 my-10 rounded-xl shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" onClick={() => setShow(true)}>
-            Show Verify Modal
-          </button>
-          <div className="text-sm text-gray-500 text-center mt-16">
-            <span className="mr-2">Made with ❤️ by</span>
-            <a href="https://github.com/HyaCiovo" target="_blank" className="hover:underline">
-              <GithubOutlined
-                style={{ fontSize: "1.4em" }} />
-              <span className="text-blue-500 ml-2">HyaCiovo</span>
-            </a>
+        <div className="relative min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center justify-center p-4">
+          {/* Background pattern */}
+          <div className="absolute inset-0 z-0 opacity-50">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+              <defs>
+                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                  <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="0.5" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
           </div>
 
+          {/* Decorative floating elements */}
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"
+                style={{
+                  backgroundColor: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`,
+                  width: `${Math.random() * 10 + 5}rem`,
+                  height: `${Math.random() * 10 + 5}rem`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${i * 0.5}s`
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="z-10 text-center">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl 
+            font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
+              AJ-Captcha-Slider-React
+            </h1>
+            <div className="text-sm sm:text-lg md:text-xl pb-10 max-w-2xl">
+              A simple and easy-to-use captcha component for React 🥳.
+            </div>
+            <button className="font-semibold bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 
+            hover:to-purple-600 text-white py-3 px-6 my-10 rounded-xl 
+            shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:rotate-3
+            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+              onClick={() => setShow(true)}>
+              Show Verify Modal
+            </button>
+            <div className="text-sm text-gray-500 text-center mt-16">
+              <span className="mr-2">Made with ❤️ by</span>
+              <a href="https://github.com/HyaCiovo" target="_blank" className="hover:underline">
+                <GithubOutlined
+                  style={{ fontSize: "1.4em" }} />
+                <span className="text-blue-500 ml-2">HyaCiovo</span>
+              </a>
+            </div>
+          </div>
+          {/* Decorative shapes */}
+          <div className="absolute top-10 left-10 w-20 h-20 border-4 border-blue-300 rounded-full opacity-50" />
+          <div className="absolute bottom-10 right-10 w-16 h-16 bg-purple-300 rounded-lg animate-bounce opacity-50" />
+          <div className="absolute top-1/4 right-1/4 w-12 h-12 bg-yellow-300 rounded-full opacity-50" />
         </div>
       </AntdApp>
     </ConfigProvider>

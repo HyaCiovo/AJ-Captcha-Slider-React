@@ -4,7 +4,7 @@ import { CheckCircleOutlined, CloseCircleOutlined, DoubleRightOutlined, LoadingO
 // import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/captcha';
 import { getPicture, checkCaptcha, CaptchaRes } from '../../apis/mock';
 import { aesEncrypt, uuid } from './utils';
-import './index.css';
+import './index.less';
 
 const Scale = {
   'default': 1,
@@ -149,6 +149,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
       return;
     // 获取栏区域左边界的坐标
     const newBarAreaLeft = event.getBoundingClientRect().left;
+    
     // 获取栏区域的宽度
     const newBarAreaOffsetWidth = event.offsetWidth;
     // 更新状态，设置栏区域的左边界
@@ -161,6 +162,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     if (isEnd.current)
       return;
     setStatus(true)
+    move(e)
     e.stopPropagation()
   }
 
@@ -179,7 +181,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     const maxLeft = barAreaOffsetWidth - blockWidth
 
     // 根据滑动位置计算滑动块的实际左边距，确保它在允许的范围内
-    const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft, maxLeft))
+    const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft - 1 / 2 * blockWidth, maxLeft))
     // 拖动后小方块的left值
     const left = `${Math.max(0, moveBlockLeft)}px`;
 
@@ -261,7 +263,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
       styles={{
         content: {
           padding: `16px ${padding}px 10px`,
-          userSelect: 'none'
+          userSelect: 'none',
         }
       }}
       footer={null}
@@ -271,7 +273,8 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
         onMouseMove={move}
         onTouchMove={move}
         onMouseUp={end}
-        onTouchEnd={end}>
+        onTouchEnd={end}
+      >
         <div>
           {isLoading ?
             <div
