@@ -1,12 +1,10 @@
-// .verifybox:after {
-//   content: '';
-//   width: 100vh;
-//   height: 100vh;
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   z-index: 0;
-// }
+.captcha-modal{
+  .ant-modal-close{
+    &:hover{
+      transform: scale(110%);
+    }
+  }
+}
 
 /*滑动验证码*/
 .verify-bar-area {
@@ -17,11 +15,10 @@
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .verify-bar-area .verify-move-block {
-  // position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -30,7 +27,7 @@
   box-sizing: content-box;
   box-shadow: 0 6px 16px -8px #00000014, 0 9px 28px 0 #0000000d,
     0 12px 48px 16px #00000008;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .verify-img-out {
@@ -44,6 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  border-radius: 6px;
 }
 
 .verify-img-panel {
@@ -52,7 +50,7 @@
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   border-bottom: 1px solid #ddd;
-  border-radius: 3px;
+  border-radius: 8px;
   position: relative;
 }
 
@@ -77,7 +75,7 @@
 .verify-img {
   width: 100%;
   height: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
   display: block;
   user-select: none;
   -webkit-user-drag: none;

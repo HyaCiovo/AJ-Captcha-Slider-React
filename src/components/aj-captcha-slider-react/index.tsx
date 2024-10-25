@@ -283,6 +283,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   return (
     <Modal
       title={title}
+      className='captcha-modal'
       centered
       open={show}
       maskClosable={false}

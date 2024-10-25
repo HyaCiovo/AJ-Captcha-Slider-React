@@ -9,6 +9,7 @@ const AntdTheme: ThemeConfig = {
   token: {
     colorTextBase: "#333",
     fontFamily: "Comic Sans MS",
+    borderRadius: 12
   },
   components: {
     Modal: {
@@ -94,12 +95,12 @@ const App = () => {
             ))}
           </div>
 
-          <div className="z-10 text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl 
+          <div className="z-10 text-center flex flex-col items-center">
+            <h1 className="title text-2xl sm:text-3xl md:text-4xl lg:text-6xl select-none hover:scale-105 transform duration-300
             font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
               AJ-Captcha-Slider-React
             </h1>
-            <div className="text-sm sm:text-lg md:text-xl pb-10 max-w-2xl">
+            <div className="select-none text-sm sm:text-lg md:text-xl pb-10 max-w-[70vw] hover:scale-105 transform duration-300">
               A simple and easy-to-use captcha component for React 🥳.
             </div>
             <button className="font-semibold bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 
@@ -109,7 +110,7 @@ const App = () => {
               onClick={() => setShow(true)}>
               Show Verify Modal
             </button>
-            <div className="text-sm text-gray-500 text-center mt-16">
+            <div className="text-sm text-gray-500 text-center mt-16 select-none  hover:scale-105 transform duration-300">
               <span className="mr-2">Made with ❤️ by</span>
               <a href="https://github.com/HyaCiovo" target="_blank" className="hover:underline">
                 <GithubOutlined
