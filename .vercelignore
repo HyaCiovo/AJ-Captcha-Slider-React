@@ -1,0 +1,10 @@
+README.md
+.vscode/*
+.npmrc
+.gitignore
+LICENSE
+pnpm-lock.yaml
+tsconfig.json
+tsconfig.node.json
+tsconfig.app.json
+package.json
