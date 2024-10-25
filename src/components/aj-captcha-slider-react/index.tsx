@@ -70,7 +70,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const [isLoading, setLoading] = useState<boolean>(false); // 是否加载
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
   const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
-  const [showTips, setTips] = useState<boolean>(true); // 提示文案
+  const [showTips, setTips] = useState<boolean>(true); // 是否展示提示文案
   const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
   const [barAreaLeft, setBarAreaLeft] = useState<number>(0);
@@ -78,6 +78,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const isEnd = useRef<boolean>(false);
   const status = useRef<boolean>(false);
   const [blockHover, setHover] = useState<boolean>(false);
+
   const { message } = App.useApp();
 
   const isSupportTouch = 'ontouchstart' in window;
@@ -162,6 +163,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const setBarArea = (event: HTMLDivElement | null) => {
     if (!event)
       return;
+
     // 获取栏区域左边界的坐标
     const newBarAreaLeft = event.getBoundingClientRect().left;
 
@@ -338,7 +340,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                 width: imgWidth,
                 height: setSize.barHeight
               }}
-              ref={(e) => setBarArea(e)}
+              ref={(bar) => setBarArea(bar)}
             >
               <div
                 className="verify-msg"
