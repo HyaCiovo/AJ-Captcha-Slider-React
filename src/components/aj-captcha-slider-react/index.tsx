@@ -71,18 +71,21 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const [response, setResponse] = useState<CaptchaRes | null>(null); // token、密钥、图片等数据
   const [icon, setIcon] = useState<AJCaptchaIconProps>('loading'); // 滑块icon
   const [showTips, setTips] = useState<boolean>(true); // 是否展示提示文案
-  const [moveBlockLeft, setBlockLeft] = useState<string | null>(null);
-  const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
-  const [barAreaLeft, setBarAreaLeft] = useState<number>(0);
-  const [barAreaOffsetWidth, setBarAreaOffsetWidth] = useState<number>(0);
+  const [moveBlockLeft, setBlockLeft] = useState<string | null>(null); // 滑块左边界和左侧色块宽度
+  const [blockPressed, setPressed] = useState<boolean>(false); // 滑块是否被按下
+
+  const barAreaRef = useRef({
+    barAreaLeft: 0,
+    barAreaOffsetWidth: 0
+  })
+
   const isEnd = useRef<boolean>(false);
   const status = useRef<boolean>(false);
-  const [blockHover, setHover] = useState<boolean>(false);
+  const moveLeft = useRef<string>('');
 
   const { message } = App.useApp();
 
   const isSupportTouch = 'ontouchstart' in window;
-
   const events = isSupportTouch
     ? {
       start: 'touchstart',
@@ -138,9 +141,6 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
 
     // 重置方块左侧位置，以便重新计算或应用默认布局
     setBlockLeft('');
-
-    // 重置左侧栏宽度，以适应界面布局变化或重置布局
-    setLeftBarWidth('');
   }
 
   const getData = () => {
@@ -163,23 +163,22 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const setBarArea = (event: HTMLDivElement | null) => {
     if (!event)
       return;
-
     // 获取栏区域左边界的坐标
     const newBarAreaLeft = event.getBoundingClientRect().left;
-
     // 获取栏区域的宽度
     const newBarAreaOffsetWidth = event.offsetWidth;
-    // 更新状态，设置栏区域的左边界
-    setBarAreaLeft(newBarAreaLeft);
-    // 更新状态，设置栏区域的宽度
-    setBarAreaOffsetWidth(newBarAreaOffsetWidth);
+    // 更新状态
+    barAreaRef.current = {
+      barAreaLeft: newBarAreaLeft, // 记录栏区域的左边界
+      barAreaOffsetWidth: newBarAreaOffsetWidth // 记录栏区域的宽度
+    }
   }
 
   const start = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (isEnd.current)
       return;
     status.current = true;
-    setHover(true);
+    setPressed(true);
 
     document.addEventListener(events.move, move as any);
     document.addEventListener(events.end, end);
@@ -199,10 +198,10 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     const x = 'touches' in e ? e.touches[0].pageX : e.clientX
 
     // 计算滑动块可以移动的最大左边距
-    const maxLeft = barAreaOffsetWidth - blockWidth
+    const maxLeft = barAreaRef.current.barAreaOffsetWidth - blockWidth
 
     // 根据滑动位置计算滑动块的实际左边距，确保它在允许的范围内
-    const moveBlockLeft = Math.max(0, Math.min(x - barAreaLeft - 1 / 2 * blockWidth, maxLeft))
+    const moveBlockLeft = Math.max(0, Math.min(x - barAreaRef.current.barAreaLeft - blockWidth / 2, maxLeft))
     // 拖动后小方块的left值
     const left = `${Math.max(0, moveBlockLeft)}px`;
 
@@ -210,10 +209,9 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     setTips(false);
     // 更新滑动块的左边距
     setBlockLeft(left);
-    // 同时更新左侧栏的宽度，保持与滑动块位置一致
-    setLeftBarWidth(left);
+    // 记录滑动块的左边距
+    moveLeft.current = left;
   }
-
   const end = () => {
     document.removeEventListener(events.move, move as any);
     document.removeEventListener(events.end, end);
@@ -221,8 +219,9 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
     // 判断是否重合
     if (status.current && !isEnd.current) {
       setIcon('loading')
+
       const moveLeftDistance = parseInt(
-        (moveBlockLeft || '').replace('px', '')
+        moveLeft.current.replace('px', '')
       )
 
       const rawPointJson = JSON.stringify({
@@ -269,7 +268,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
           }, 800)
         })
       status.current = false;
-      setHover(false);
+      setPressed(false);
     }
   }
 
@@ -357,8 +356,8 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                 className="verify-left-bar"
                 style={{
                   width:
-                    leftBarWidth !== null
-                      ? leftBarWidth
+                    moveBlockLeft !== null
+                      ? moveBlockLeft
                       : setSize.barHeight,
                   height: setSize.barHeight,
                   touchAction: 'pan-y'
@@ -370,8 +369,8 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                   onTouchStart={start}
                   style={{
                     width: blockWidth,
-                    backgroundColor: blockHover ? '#f2f2f2' : '#fff',
-                    cursor: blockHover ? 'grab' : 'pointer',
+                    backgroundColor: blockPressed ? '#f2f2f2' : '#fff',
+                    cursor: blockPressed ? 'grab' : 'pointer',
                     height: setSize.barHeight - 2,
                     left: moveBlockLeft || '0px'
                   }}
