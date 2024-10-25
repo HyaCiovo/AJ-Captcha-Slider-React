@@ -292,120 +292,111 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
       footer={null}
       onCancel={closeBox}
     >
-      <div className="verifybox"
-      // onMouseMove={move}
-      // onTouchMove={move}
-      // onMouseUp={end}
-      // onTouchEnd={end}
-      >
-        <div>
-          {isLoading ?
+      <div className="verifybox">
+        {isLoading ?
+          <div
+            style={{
+              width: imgWidth,
+            }}>
             <div
-              style={{
-                width: imgWidth,
-              }}>
-              <div
-                className="verify-img-out"
-                style={{ height: imgHeight + vSpace }}
-              >
-                <Skeleton.Image active
-                  style={{ height: imgHeight, width: imgWidth }} />
-              </div>
-              <Skeleton.Node active
-                style={{ height: setSize.barHeight, width: imgWidth }}
-              />
+              className="verify-img-out"
+              style={{ height: imgHeight + vSpace }}
+            >
+              <Skeleton.Image active
+                style={{ height: imgHeight, width: imgWidth }} />
             </div>
-            :
-            <div>
+            <Skeleton.Node active
+              style={{ height: setSize.barHeight, width: imgWidth }}
+            />
+          </div>
+          :
+          <div>
+            <div
+              className="verify-img-out"
+              style={{ height: imgHeight + vSpace }}
+            >
               <div
-                className="verify-img-out"
-                style={{ height: imgHeight + vSpace }}
-              >
-                <div
-                  className="verify-img-panel"
-                  style={{
-                    width: imgWidth,
-                    height: imgHeight
-                  }}
-                >
-                  {response?.originalImageBase64 &&
-                    <img
-                      src={'data:image/png;base64,' + response?.originalImageBase64}
-                      alt="captcha-image"
-                      draggable={false}
-                      className="verify-img"
-                    />}
-                </div>
-              </div>
-
-              <div
-                className="verify-bar-area"
+                className="verify-img-panel"
                 style={{
                   width: imgWidth,
-                  height: setSize.barHeight
+                  height: imgHeight
                 }}
-                ref={(e) => setBarArea(e)}
+              >
+                {response?.originalImageBase64 &&
+                  <img
+                    src={'data:image/png;base64,' + response?.originalImageBase64}
+                    alt="captcha-image"
+                    draggable={false}
+                    className="verify-img"
+                  />}
+              </div>
+            </div>
+
+            <div
+              className="verify-bar-area"
+              style={{
+                width: imgWidth,
+                height: setSize.barHeight
+              }}
+              ref={(e) => setBarArea(e)}
+            >
+              <div
+                className="verify-msg"
+                style={{
+                  lineHeight: setSize.barHeight + 'px',
+                  marginLeft: blockWidth + 'px',
+                  width: imgWidth - blockWidth + 'px',
+                  display: showTips ? 'block' : 'none'
+                }}
+              >
+                {tips}
+              </div>
+              <div
+                className="verify-left-bar"
+                style={{
+                  width:
+                    leftBarWidth !== null
+                      ? leftBarWidth
+                      : setSize.barHeight,
+                  height: setSize.barHeight,
+                  touchAction: 'pan-y'
+                }}
               >
                 <div
-                  className="verify-msg"
+                  className="verify-move-block"
+                  onMouseDown={start}
+                  onTouchStart={start}
                   style={{
-                    lineHeight: setSize.barHeight + 'px',
-                    marginLeft: blockWidth + 'px',
-                    width: imgWidth - blockWidth + 'px',
-                    display: showTips ? 'block' : 'none'
+                    width: blockWidth,
+                    backgroundColor: blockHover ? '#f2f2f2' : '#fff',
+                    cursor: blockHover ? 'grab' : 'pointer',
+                    height: setSize.barHeight - 2,
+                    left: moveBlockLeft || '0px'
                   }}
-                >
-                  {tips}
-                </div>
-                <div
-                  className="verify-left-bar"
-                  style={{
-                    width:
-                      leftBarWidth !== null
-                        ? leftBarWidth
-                        : setSize.barHeight,
-                    height: setSize.barHeight,
-                    touchAction: 'pan-y'
-                  }}
-                >
+                >{<AJCaptchaIcon icon={icon} />}
                   <div
-                    className="verify-move-block"
-                    onMouseDown={start}
-                    onTouchStart={start}
+                    className='verify-sub-block'
                     style={{
                       width: blockWidth,
-                      backgroundColor: blockHover ? '#f2f2f2' : '#fff',
-                      cursor: blockHover ? 'grab' : 'pointer',
-                      height: setSize.barHeight - 2,
-                      left: moveBlockLeft || '0px'
+                      height: imgHeight,
+                      top: `-${imgHeight + vSpace}px`,
+                      backgroundSize: `${imgWidth} ${imgHeight}`
                     }}
-                  >{<AJCaptchaIcon icon={icon} />}
-                    <div
-                      className='verify-sub-block'
-                      style={{
-                        width: blockWidth,
-                        height: imgHeight,
-                        top: `-${imgHeight + vSpace}px`,
-                        backgroundSize: `${imgWidth} ${imgHeight}`
-                      }}
-                    >
-                      {response?.jigsawImageBase64 &&
-                        <img
-                          src={
-                            'data:image/png;base64,' +
-                            response?.jigsawImageBase64
-                          }
-                          alt="blockImage"
-                          className="verify-img"
-                        />}
-                    </div>
+                  >
+                    {response?.jigsawImageBase64 &&
+                      <img
+                        src={
+                          'data:image/png;base64,' +
+                          response?.jigsawImageBase64
+                        }
+                        alt="blockImage"
+                        className="verify-img"
+                      />}
                   </div>
                 </div>
               </div>
             </div>
-          }
-
-        </div>
+          </div>}
         <div className="verify-very-bottom">
           <div
             className="verify-refresh"
