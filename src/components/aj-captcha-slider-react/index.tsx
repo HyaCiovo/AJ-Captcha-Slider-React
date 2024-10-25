@@ -75,9 +75,24 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const [leftBarWidth, setLeftBarWidth] = useState<string | null>(null);
   const [barAreaLeft, setBarAreaLeft] = useState<number>(0);
   const [barAreaOffsetWidth, setBarAreaOffsetWidth] = useState<number>(0);
-  const isEnd = useRef<boolean>(false)
-  const [status, setStatus] = useState<boolean>(false)
+  const isEnd = useRef<boolean>(false);
+  const status = useRef<boolean>(false);
+  const [blockHover, setHover] = useState<boolean>(false);
   const { message } = App.useApp();
+
+  const isSupportTouch = 'ontouchstart' in window;
+
+  const events = isSupportTouch
+    ? {
+      start: 'touchstart',
+      move: 'touchmove',
+      end: 'touchend'
+    }
+    : {
+      start: 'mousedown',
+      move: 'mousemove',
+      end: 'mouseup'
+    };
 
   const scale = Scale[size]
   const blockWidth = sliderBlockWidth * scale
@@ -115,7 +130,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
 
     // 重置flags状态，准备下一次交互
     isEnd.current = false;
-    setStatus(false);
+    status.current = false;
 
     // 设置提示信息，指导用户进行下一步操作
     setTips(true);
@@ -149,7 +164,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
       return;
     // 获取栏区域左边界的坐标
     const newBarAreaLeft = event.getBoundingClientRect().left;
-    
+
     // 获取栏区域的宽度
     const newBarAreaOffsetWidth = event.offsetWidth;
     // 更新状态，设置栏区域的左边界
@@ -161,8 +176,12 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   const start = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (isEnd.current)
       return;
-    setStatus(true)
-    move(e)
+    status.current = true;
+    setHover(true);
+
+    document.addEventListener(events.move, move as any);
+    document.addEventListener(events.end, end);
+    document.addEventListener('touchcancel', end);
     e.stopPropagation()
   }
 
@@ -172,7 +191,7 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
    */
   const move = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     // 如果当前状态不允许滑动或滑动已结束，则直接返回，不执行后续操作
-    if (!status || isEnd.current) return;
+    if (!status.current || isEnd.current) return;
 
     // 根据事件类型（触摸或鼠标）获取滑动的x坐标
     const x = 'touches' in e ? e.touches[0].pageX : e.clientX
@@ -194,8 +213,11 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
   }
 
   const end = () => {
+    document.removeEventListener(events.move, move as any);
+    document.removeEventListener(events.end, end);
+    document.removeEventListener('touchcancel', end);
     // 判断是否重合
-    if (status && !isEnd.current) {
+    if (status.current && !isEnd.current) {
       setIcon('loading')
       const moveLeftDistance = parseInt(
         (moveBlockLeft || '').replace('px', '')
@@ -244,7 +266,8 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
             refresh()
           }, 800)
         })
-      setStatus(false)
+      status.current = false;
+      setHover(false);
     }
   }
 
@@ -270,10 +293,10 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
       onCancel={closeBox}
     >
       <div className="verifybox"
-        onMouseMove={move}
-        onTouchMove={move}
-        onMouseUp={end}
-        onTouchEnd={end}
+      // onMouseMove={move}
+      // onTouchMove={move}
+      // onMouseUp={end}
+      // onTouchEnd={end}
       >
         <div>
           {isLoading ?
@@ -351,7 +374,8 @@ const AJCaptchaSlider: React.FC<AJCaptchaSliderProps> = ({
                     onTouchStart={start}
                     style={{
                       width: blockWidth,
-                      backgroundColor: status ? '#f2f2f2' : '#fff',
+                      backgroundColor: blockHover ? '#f2f2f2' : '#fff',
+                      cursor: blockHover ? 'grab' : 'pointer',
                       height: setSize.barHeight - 2,
                       left: moveBlockLeft || '0px'
                     }}
