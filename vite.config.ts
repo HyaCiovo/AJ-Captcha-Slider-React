@@ -24,4 +24,23 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    target: "modules",
+    outDir: "build",
+    assetsDir: "assets",
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    minify: "esbuild",
+    chunkSizeWarningLimit: 500,
+    emptyOutDir: true,
+    manifest: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react"],
+          antd: ["antd"],
+        },
+      },
+    },
+  },
 });
