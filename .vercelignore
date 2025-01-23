@@ -7,3 +7,4 @@ LICENSE
 tsconfig.json
 tsconfig.node.json
 tsconfig.app.json
+pnpm-lock.yaml
