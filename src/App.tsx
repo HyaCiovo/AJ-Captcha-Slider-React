@@ -64,7 +64,7 @@ const App = () => {
           size={size}
           hide={() => setShow(false)}
         />
-        <div className="relative min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col items-center justify-center p-4">
+        <div className="relative min-h-screen bg-linear-to-b from-blue-100 to-white flex flex-col items-center justify-center p-4">
           {/* Background pattern */}
           <div className="absolute inset-0 z-0 opacity-50">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -97,13 +97,13 @@ const App = () => {
 
           <div className="z-10 text-center flex flex-col items-center">
             <h1 className="title text-2xl sm:text-3xl md:text-4xl lg:text-6xl select-none hover:scale-105 transform duration-300
-            font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
+            font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600 mb-6">
               AJ-Captcha-Slider-React
             </h1>
             <div className="select-none text-sm sm:text-lg md:text-xl pb-10 max-w-[70vw] hover:scale-105 transform duration-300">
               A simple and easy-to-use captcha component for React 🥳.
             </div>
-            <button className="font-semibold bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 
+            <button className="font-semibold bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 
             hover:to-purple-600 text-white py-3 px-6 my-10 rounded-xl 
             shadow-lg transition-all duration-300 ease-in-out hover:scale-105 hover:rotate-3
             focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
